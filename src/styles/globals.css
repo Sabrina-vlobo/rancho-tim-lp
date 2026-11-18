@@ -1,0 +1,520 @@
+@import "tailwindcss";
+
+/* Tokens por função. Os valores ficam logo abaixo, em :root. */
+@theme inline {
+  --color-fundo: var(--t-fundo);
+  --color-fundo-2: var(--t-fundo-2);
+  --color-salvia: var(--t-salvia);
+  --color-titulo: var(--t-titulo);
+  --color-tinta: var(--t-tinta);
+  --color-texto-suave: var(--t-suave);
+  --color-linha: var(--t-linha);
+  --color-escuro: var(--t-escuro);
+  --color-escuro-2: var(--t-escuro-2);
+  --color-claro: var(--t-claro);
+  --color-acento: var(--t-acento);
+  --color-acento-hover: var(--t-acento-hover);
+  --color-acento-claro: var(--t-acento-claro);
+
+  --font-titulo: "Archivo Variable", system-ui, sans-serif;
+  --font-sans: "Archivo Variable", system-ui, sans-serif;
+  --font-marca: "Oswald Variable", "Arial Narrow", sans-serif;
+
+  /* Curva forte: as nativas do CSS são fracas demais */
+  --ease-strong: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Cores da marca (as mesmas do logo): verde-mata e terracota.
+   O fundo é branco neutro, sem bege. */
+:root {
+  --t-fundo: #fcfcfb;
+  --t-fundo-2: #f1f3f1;
+  --t-salvia: #e2eae4; /* faixa verde-clara, puxada do verde-mata do logo */
+  --t-titulo: #2f4a3a;
+  --t-tinta: #1f2a23;
+  --t-suave: #4e5a52;
+  --t-linha: #dde2de;
+  --t-escuro: #2f4a3a;
+  --t-escuro-2: #233a2d;
+  --t-claro: #fcfcfb;
+  --t-acento: #9a4424;
+  --t-acento-hover: #b5532e;
+  --t-acento-claro: #e89a6b;
+}
+
+/* Título: Archivo larga e firme, com espaçamento negativo e quebra equilibrada. */
+@utility titulo {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-stretch: 112%;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+/* Título de seção: um tamanho só para a página inteira */
+@utility secao-titulo {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-stretch: 112%;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  font-size: clamp(2.25rem, 4.6vw, 4rem);
+  line-height: 1.02;
+}
+
+/* Moldura de foto: o mesmo raio da moldura em que o hero termina */
+@utility moldura {
+  overflow: hidden;
+  border-radius: 18px;
+  isolation: isolate;
+
+  @media (min-width: 768px) {
+    border-radius: 22px;
+  }
+}
+
+/* Versão para títulos pequenos (abaixo de ~30px): um pouco menos larga e mais aberta */
+@utility titulo-p {
+  font-family: var(--font-titulo);
+  font-weight: 650;
+  font-stretch: 106%;
+  letter-spacing: -0.018em;
+}
+
+:root {
+  interpolate-size: allow-keywords;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* desconta o header fixo quando a rolagem é a nativa */
+  scroll-padding-top: 72px;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 92px;
+  }
+}
+
+/* Nada passa da largura da tela. "clip" (e não "hidden") não cria uma
+   área de rolagem nova, então o position: sticky continua funcionando. */
+html,
+body {
+  overflow-x: clip;
+}
+
+/* O GSAP trava a largura do hero em pixels enquanto ele fica parado na
+   rolagem; se a janela mudar de largura (ou a barra de rolagem aparecer),
+   esse valor fica velho e cria rolagem horizontal. Aqui ele segue a tela. */
+.pin-spacer:has(> #topo) {
+  width: auto !important;
+  max-width: 100% !important;
+}
+
+#topo {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Barra de rolagem fina e discreta, no verde da marca.
+   Chrome/Edge/Firefox usam scrollbar-color; Safari usa o ::-webkit-scrollbar. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(47 74 58 / 0.32) transparent;
+}
+
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: rgb(47 74 58 / 0.32) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(47 74 58 / 0.55) padding-box;
+  }
+}
+
+::selection {
+  background: var(--color-titulo);
+  color: var(--color-claro);
+}
+
+body {
+  accent-color: var(--color-acento);
+  background: var(--color-fundo);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-wrap: pretty;
+}
+
+/* Seções que recebem foco pelo menu não ganham contorno */
+section:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 3px;
+}
+
+/* ---------- Movimento ---------- */
+
+/* Entrada do hero: acontece uma vez, ao abrir a página */
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hero-in {
+  animation: hero-in 700ms var(--ease-strong) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* A foto do hero chega com um zoom lento, uma vez só */
+@keyframes hero-foto {
+  from {
+    transform: scale(1.07);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.hero-foto {
+  animation: hero-foto 1800ms var(--ease-strong) both;
+}
+
+/* Revelação no scroll: só transform e opacity */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 600ms var(--ease-strong) var(--d, 0ms),
+    transform 600ms var(--ease-strong) var(--d, 0ms);
+}
+
+[data-reveal][data-inview] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Dúvidas: abre e fecha suave onde o navegador suporta */
+details::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size 250ms var(--ease-strong),
+    content-visibility 250ms allow-discrete;
+}
+
+details[open]::details-content {
+  block-size: auto;
+}
+
+/* Usos: a foto do item ativo entra de baixo para cima por cima da anterior */
+.uso-foto {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 900ms cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.uso-foto > img {
+  scale: 1.08;
+  transition: scale 1200ms var(--ease-strong);
+}
+
+.uso-foto[data-ativo] {
+  clip-path: inset(0 0 0 0);
+  z-index: 1;
+}
+
+.uso-foto[data-ativo] > img {
+  scale: 1;
+}
+
+/* o primeiro já começa visível, sem animação ao carregar */
+.uso-foto:first-child {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Item fora do meio da tela fica mais claro, sem perder a leitura:
+   título a 60% (contraste 3,2:1, texto grande) e texto a 85% (4,8:1) */
+@media (min-width: 1024px) {
+  .uso-item h3,
+  .uso-item p {
+    transition:
+      color 500ms var(--ease-strong),
+      opacity 500ms var(--ease-strong);
+  }
+
+  .uso-item:not([data-ativo]) h3 {
+    color: rgb(47 74 58 / 0.6);
+  }
+
+  .uso-item:not([data-ativo]) p {
+    opacity: 0.85;
+  }
+}
+
+/* Estrutura, desktop: a foto do ambiente escolhido aparece por cima da
+   anterior. A anterior só some depois que a nova terminou de entrar, então
+   nunca aparece fundo vazio, nem quando o mouse passa rápido pela lista. */
+.camada-ambiente {
+  opacity: 0;
+  z-index: 1;
+  transition:
+    opacity 0ms linear 700ms,
+    z-index 0ms linear 700ms;
+}
+
+.camada-ambiente[data-ativo] {
+  opacity: 1;
+  z-index: 2;
+  transition: opacity 700ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.camada-ambiente img {
+  scale: 1.04;
+  transition: scale 1100ms var(--ease-strong);
+}
+
+.camada-ambiente[data-ativo] img {
+  scale: 1;
+}
+
+/* Celular e texto: fade simples */
+@keyframes painel-in {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.painel-ambiente {
+  animation: painel-in 500ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+.painel-texto {
+  animation: fade-in 450ms ease both;
+}
+
+/* Carrossel do celular sem barra de rolagem visível */
+.trilho {
+  scrollbar-width: none;
+}
+
+.trilho::-webkit-scrollbar {
+  display: none;
+}
+
+/* Passos da reserva: a linha que liga os números se desenha uma vez */
+.passos::before {
+  content: "";
+  position: absolute;
+  background: var(--color-titulo);
+  transform-origin: top;
+  left: 23.25px;
+  top: 24px;
+  bottom: 24px;
+  width: 1.5px;
+  scale: 1 0;
+  transition: scale 1400ms var(--ease-strong) 150ms;
+}
+
+@media (min-width: 1024px) {
+  .passos::before {
+    transform-origin: left;
+    left: 24px;
+    right: 0;
+    top: 23.25px;
+    bottom: auto;
+    width: auto;
+    height: 1.5px;
+    scale: 0 1;
+  }
+}
+
+.passos[data-inview]::before {
+  scale: 1 1;
+}
+
+.passo {
+  opacity: 0;
+  translate: 0 12px;
+  transition:
+    opacity 600ms var(--ease-strong),
+    translate 600ms var(--ease-strong);
+  transition-delay: calc(200ms + var(--i, 0) * 120ms);
+}
+
+.passos[data-inview] .passo {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* Links do header: no hover a palavra sobe e uma cópia entra por baixo */
+.rolo {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.rolo > span {
+  display: block;
+  padding-block: 8px;
+  transition: transform 450ms var(--ease-strong);
+}
+
+.rolo > span + span {
+  position: absolute;
+  inset: 0;
+  transform: translateY(100%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rolo:hover > span:first-child {
+    transform: translateY(-100%);
+  }
+
+  .rolo:hover > span + span {
+    transform: none;
+  }
+}
+
+/* Menu em tela cheia */
+.menu-tela {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 300ms var(--ease-strong),
+    visibility 0s linear 300ms;
+}
+
+.menu-tela[data-aberto] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 300ms var(--ease-strong);
+}
+
+.menu-tela .menu-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.menu-tela[data-aberto] .menu-item {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 500ms var(--ease-strong),
+    transform 500ms var(--ease-strong);
+  transition-delay: calc(80ms + var(--i, 0) * 45ms);
+}
+
+/* Movimento reduzido: fica só o fade, sem deslocamento */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-in {
+    animation: fade-in 200ms ease both;
+  }
+
+  .hero-foto {
+    animation: none;
+  }
+
+  [data-reveal] {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+
+  details::details-content {
+    transition: none;
+  }
+
+  .rolo > span {
+    transition: none;
+  }
+
+  .uso-foto,
+  .uso-foto > img {
+    transition: opacity 300ms ease;
+    scale: 1;
+  }
+
+  .uso-foto {
+    clip-path: none;
+    opacity: 0;
+  }
+
+  .uso-foto[data-ativo],
+  .uso-foto:first-child {
+    opacity: 1;
+  }
+
+  .passos::before {
+    scale: 1 1;
+    transition: none;
+  }
+
+  .painel-ambiente,
+  .painel-texto {
+    animation: fade-in 200ms ease both;
+  }
+
+  .camada-ambiente,
+  .camada-ambiente[data-ativo] {
+    transition: opacity 250ms ease;
+  }
+
+  .camada-ambiente img {
+    scale: 1;
+    transition: none;
+  }
+
+  .passo {
+    translate: none;
+    transition: opacity 200ms ease;
+  }
+
+  .menu-tela .menu-item,
+  .menu-tela[data-aberto] .menu-item {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+}
